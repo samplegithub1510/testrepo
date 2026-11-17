@@ -4,6 +4,7 @@ import { AnimatePresence, m, useMotionValueEvent, useScroll, useSpring, useTrans
 import { useLenis } from "lenis/react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { profile, projects, type Project } from "@/content";
+import DemoPlayer from "./DemoPlayer";
 import Diagram from "./Diagram";
 import { StatusTag } from "./ProjectCard";
 import { useMotionPref } from "./useMotionPref";
@@ -219,6 +220,7 @@ export default function WhitePaper({
               },
             ]
           : []),
+        ...(project.demo ? [{ title: "See it work", body: <DemoPlayer key={project.slug} demo={project.demo} root={scrollRef} /> }] : []),
       ] as { title: string; body: React.ReactNode }[])
     : [];
 
@@ -283,18 +285,18 @@ export default function WhitePaper({
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, root: scrollRef, amount: 0.4 }}
                       transition={{ duration: 0.5, ease, delay: i * 0.05 }}
-                      className="grid gap-3 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-8"
+                      className="grid grid-cols-1 gap-3 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-8"
                     >
                       <h3 className="font-display text-lg font-bold text-fg">
                         <span className="mr-2 text-accent">{i + 1}.</span>
                         {s.title}
                       </h3>
-                      <div className="text-[1.05rem] leading-relaxed text-fg/90">{s.body}</div>
+                      <div className="min-w-0 text-[1.05rem] leading-relaxed text-fg/90">{s.body}</div>
                     </m.section>
                   ))}
 
                   {project.links.length > 0 && (
-                    <section className="grid gap-3 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-8">
+                    <section className="grid grid-cols-1 gap-3 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-8">
                       <h3 className="font-display text-lg font-bold text-fg">Links</h3>
                       <ul className="flex flex-wrap gap-3">
                         {project.links.map((l) => (
