@@ -47,7 +47,7 @@ function LazyThumb({ project }: { project: Project }) {
     return () => io.disconnect();
   }, []);
   return (
-    <div ref={ref} className="aspect-[720/380] transition-transform duration-500 group-hover:scale-[1.03]">
+    <div ref={ref} className="aspect-[720/400] transition-transform duration-500 group-hover:scale-[1.03]">
       {show && <Diagram spec={project.diagram} compact />}
     </div>
   );

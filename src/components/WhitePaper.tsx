@@ -22,23 +22,27 @@ function ScrollFigure({ project, scroller }: { project: Project; scroller: React
   const n = project.diagram.nodes.length;
   const { scrollY } = useScroll({ container: scroller });
 
+  // Where the figure starts inside the scrolling case study. Measured live
+  // (fonts and layout can still be settling when the dialog opens).
+  const measure = () => {
+    const c = scroller.current;
+    const w = wrapRef.current;
+    if (!c || !w) return top.current;
+    top.current = w.getBoundingClientRect().top - c.getBoundingClientRect().top + c.scrollTop - 24;
+    return top.current;
+  };
   useLayoutEffect(() => {
-    const measure = () => {
-      const c = scroller.current;
-      const w = wrapRef.current;
-      if (!c || !w) return;
-      top.current = w.getBoundingClientRect().top - c.getBoundingClientRect().top + c.scrollTop - 24;
-    };
     measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [scroller, project.slug]);
+  });
 
-  const raw = useTransform(scrollY, (v) => Math.min(n - 1, Math.max(0, (v - top.current) / STEP_PX)));
-  const step = useSpring(raw, { stiffness: 160, damping: 28, restDelta: 0.001 });
-  const [active, setActive] = useState(0);
-  useMotionValueEvent(raw, "change", (v) => setActive(Math.min(n - 1, Math.round(v))));
-  const node = project.diagram.nodes[active];
+  // −1 = overview before the walk-through, 0 … n−1 = each step, n = full system again
+  const raw = useTransform(scrollY, (v) => Math.min(n, Math.max(-1, (v - measure()) / STEP_PX - 1)));
+  const step = useSpring(raw, { stiffness: 120, damping: 26, restDelta: 0.001 });
+  const [active, setActive] = useState(-1);
+  useMotionValueEvent(raw, "change", (v) => setActive(v < -0.5 ? -1 : v > n - 0.5 ? n : Math.round(v)));
+  const node = active >= 0 && active < n ? project.diagram.nodes[active] : null;
+  const [phone, setPhone] = useState(false);
+  useEffect(() => setPhone(window.innerWidth < 640), []);
 
   if (reduce) {
     return (
@@ -55,7 +59,7 @@ function ScrollFigure({ project, scroller }: { project: Project; scroller: React
     <div ref={wrapRef} className="relative mt-10">
       <figure className="sticky top-6 overflow-hidden rounded-2xl border border-line bg-[var(--dg-bg)]">
         <div className="px-3 pt-4 sm:px-6 sm:pt-6">
-          <Diagram spec={project.diagram} step={step} title={project.title} />
+          <Diagram spec={project.diagram} step={step} zoom={phone ? 2 : 1.55} title={project.title} />
         </div>
 
         {/* step caption */}
@@ -70,7 +74,7 @@ function ScrollFigure({ project, scroller }: { project: Project; scroller: React
           </div>
           <AnimatePresence mode="wait" initial={false}>
             <m.p
-              key={node.id}
+              key={node ? node.id : active < 0 ? "start" : "end"}
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
@@ -78,15 +82,23 @@ function ScrollFigure({ project, scroller }: { project: Project; scroller: React
               className="text-sm text-muted"
               aria-live="polite"
             >
-              <span className="font-semibold text-fg">
-                Step {active + 1} of {n}: {node.label}
-              </span>
-              {node.sub ? `, ${node.sub}` : ""}
+              {node ? (
+                <>
+                  <span className="font-semibold text-fg">
+                    Step {active + 1} of {n}: {node.label}
+                  </span>
+                  {node.sub ? `, ${node.sub}` : ""}
+                </>
+              ) : active < 0 ? (
+                <span className="font-semibold text-fg">The whole system. Scroll to walk through it step by step.</span>
+              ) : (
+                <span className="font-semibold text-fg">The whole system, end to end.</span>
+              )}
             </m.p>
           </AnimatePresence>
           <m.span
             className="ml-auto inline-flex items-center gap-1.5 text-xs text-muted"
-            animate={{ opacity: active === n - 1 ? 0 : 1 }}
+            animate={{ opacity: active >= n ? 0 : 1 }}
             aria-hidden="true"
           >
             Scroll
@@ -100,7 +112,7 @@ function ScrollFigure({ project, scroller }: { project: Project; scroller: React
         </figcaption>
       </figure>
       {/* scroll room for the steps (sticky ignores padding, so this is a real spacer) */}
-      <div aria-hidden="true" style={{ height: (n - 1) * STEP_PX + 80 }} />
+      <div aria-hidden="true" style={{ height: (n + 1) * STEP_PX + 80 }} />
     </div>
   );
 }

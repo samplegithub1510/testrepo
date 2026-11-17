@@ -25,13 +25,26 @@ export const profile = {
   // Generated from your uploaded resume with the phone number removed.
   // Replace public/resume.pdf any time you update your resume.
   resume: "resume.pdf",
+  // Cut-out portrait (transparent background) shown on a themed card.
+  // To use a new photo, export a 900 × 1130 PNG/WebP with a transparent background.
   photo: {
-    src: "images/shambhavi-960.webp",
-    srcSmall: "images/shambhavi-560.webp",
-    alt: "Shambhavi Upadhyay smiling in a striped sweater, with autumn trees and mountains behind her",
+    src: "images/shambhavi-cutout-960.webp",
+    srcSmall: "images/shambhavi-cutout-560.webp",
+    alt: "Portrait of Shambhavi Upadhyay smiling, wearing glasses and a striped sweater",
   },
   // Used for <title>, social previews, and search engines.
   siteUrl: "https://your-domain.com", // PLACEHOLDER: set after you deploy (e.g. https://shambhavi.vercel.app)
+};
+
+// ---------------------------------------------------------------------------
+// Hero network animation: the orbit behind your name.
+// core = centre node; inner = AI layer; outer = systems you integrate.
+// Keep labels short (they render at ~12px). 4–6 inner and 8–12 outer look best.
+// ---------------------------------------------------------------------------
+export const heroNetwork = {
+  core: "Orchestrator",
+  inner: ["Claude", "GPT-4", "MCP", "RAG", "Evals"],
+  outer: ["Salesforce", "NetSuite", "Snowflake", "SAP", "ServiceNow", "Twilio", "Kafka", "Azure", "AWS", "Workday"],
 };
 
 // ---------------------------------------------------------------------------
@@ -121,6 +134,7 @@ export const experience: Role[] = [
           "Built an evaluation harness (LLM-as-judge on ~300 benchmark conversations, A/B tests, red-teaming), lifting intent accuracy from ~85% to ~92%.",
           "Added RAG, semantic caching, and a fine-tuned smaller model, cutting per-call LLM cost ~20%.",
           "Built guardrails (PII redaction, prompt-injection and jailbreak defense, hallucination validation, human escalation) and tracing across 30+ agents that surfaced failures ~50% faster.",
+          "Built a multi-tenant scheduling platform (React, TypeScript, PostgreSQL, Docker) for clinics, salons, and other small businesses; the voice agent books and changes appointments in it and every change shows on a live dashboard, with ~1,500 appointments a month for 40+ staff and ~30% booked by voice.",
         ],
       },
       {
@@ -140,6 +154,12 @@ export const experience: Role[] = [
           "Led an ITOM implementation: Discovery through MID Servers and cloud-native Discovery across AWS, Azure, and GCP, Service Mapping, Event Management with AIOps alert correlation, a CSDM-aligned CMDB, and HAM and SAM.",
           "Implemented HR Service Delivery and SecOps (Security Incident Response, Vulnerability Response), and built Virtual Agent topics for routine IT and HR requests.",
           "Ran upgrades, patches, and clones with ATF regression tests, and integrated ServiceNow with Datadog, GitHub, Workday, and Okta through IntegrationHub, REST, SOAP, and MID Server.",
+        ],
+      },
+      {
+        title: "Atlassian",
+        items: [
+          "Built Jira Service Management desks with request types, queues, and SLAs, Automation for Jira and ScriptRunner rules, and Forge and Connect apps; administered Jira and Confluence, and moved the estate to Jira Cloud with license cleanup.",
         ],
       },
       {
@@ -168,7 +188,8 @@ export const experience: Role[] = [
 //   icon: one of the IconName values above (each has its own small animation)
 //   kind: "agent" (teal), "system", "data" (dashed), "guard" (amber),
 //         "threat" (red), "person", "legacy" (faded)
-//   edges connect node ids; `dashed` draws a dotted line, `label` adds a caption,
+//   edges connect node ids; `dashed` draws a dotted line, `label` adds a fixed caption,
+//   `data` names what travels along the pipe (shown on the moving packet),
 //   `at` sets the step at which an edge appears (default: when both ends are shown).
 // links: add demo / repo / video URLs; empty ones are hidden on the site.
 //
@@ -192,7 +213,7 @@ export type DiagramNode = {
   sub?: string;
   kind?: NodeKind;
 };
-export type DiagramEdge = { from: string; to: string; label?: string; dashed?: boolean; fading?: boolean; at?: number };
+export type DiagramEdge = { from: string; to: string; label?: string; data?: string; dashed?: boolean; fading?: boolean; at?: number };
 export type Diagram = {
   caption: string;
   nodes: DiagramNode[];
@@ -243,41 +264,45 @@ export const projects: Project[] = [
         { id: "avail", x: 560, y: 274, w: 140, icon: "clock", label: "Availability agent", kind: "agent" },
       ],
       edges: [
-        { from: "caller", to: "stt" },
-        { from: "stt", to: "router" },
-        { from: "router", to: "booking" },
-        { from: "router", to: "menu" },
-        { from: "router", to: "avail" },
-        { from: "live", to: "router", dashed: true },
-        { from: "memory", to: "router", dashed: true },
+        { from: "caller", to: "stt", data: "audio" },
+        { from: "stt", to: "router", data: "transcript" },
+        { from: "router", to: "booking", data: "booking intent" },
+        { from: "router", to: "menu", data: "menu question" },
+        { from: "router", to: "avail", data: "availability check" },
+        { from: "live", to: "router", data: "live data", dashed: true },
+        { from: "memory", to: "router", data: "context", dashed: true },
       ],
     },
     links: [], // PLACEHOLDER: demo video or recording, if you can share one
   },
   {
     slug: "salon-scheduling",
-    title: "Salon Scheduling Platform & Agent Dashboard",
+    title: "Multi-Tenant Scheduling Platform & Agent Dashboard",
     status: "shipped",
-    summary: "One live schedule for direct and voice bookings, plus a dashboard across 30+ agents.",
-    problem: "Appointments came in two ways, booked directly or by the voice agent, and both had to land in one live schedule.",
+    summary: "Scheduling software for clinics, salons, and other small businesses, with the voice agent booking straight into it.",
+    problem: "Small businesses like clinics and salons needed one place to manage scheduling, and bookings taken by the voice agent had to land in the same schedule.",
     built:
-      "A full-stack scheduling app where appointments booked directly or by the voice agent sync in real time, plus a live dashboard across 30+ agents.",
-    stack: ["React", "TypeScript", "PostgreSQL", "Docker"],
+      "Multi-tenant scheduling software that gives each business, such as a clinic or salon, its own scheduling space on a shared database. The voice agent calls it to take bookings and make changes, and every booking or change shows up on a live dashboard, alongside monitoring across 30+ agents.",
+    stack: ["Multi-tenant", "React", "TypeScript", "PostgreSQL", "Docker", "Voice agent integration"],
     results: ["~1,500 appointments a month for 40+ staff", "~30% booked by voice", "Failures surfaced ~50% faster"],
     diagram: {
-      caption: "Direct and voice bookings sync into one schedule in real time; the dashboard watches every agent.",
+      caption: "Each business books into its own space on one platform; the voice agent books and changes appointments too, and every change appears on the live dashboard.",
       nodes: [
-        { id: "direct", x: 20, y: 60, w: 150, icon: "user", label: "Direct booking", sub: "React + TypeScript", kind: "person" },
-        { id: "voice", x: 20, y: 270, w: 150, icon: "bot", label: "Voice agent", sub: "~30% of bookings", kind: "agent" },
-        { id: "app", x: 260, y: 164, w: 160, icon: "sync", label: "Scheduling app", sub: "real-time sync" },
-        { id: "db", x: 520, y: 60, w: 170, icon: "database", label: "PostgreSQL", sub: "~1,500 appts / month", kind: "data" },
-        { id: "dash", x: 520, y: 270, w: 170, icon: "chart", label: "Live dashboard", sub: "30+ agents" },
+        { id: "clinic", x: 20, y: 30, w: 130, icon: "user", label: "Clinics", kind: "person" },
+        { id: "salon", x: 20, y: 164, w: 130, icon: "users", label: "Salons", kind: "person" },
+        { id: "other", x: 20, y: 296, w: 130, icon: "box", label: "Small businesses", sub: "other tenants", kind: "person" },
+        { id: "app", x: 200, y: 164, w: 160, icon: "sync", label: "Scheduling platform", sub: "multi-tenant" },
+        { id: "voice", x: 420, y: 30, w: 140, icon: "bot", label: "Voice agent", sub: "~30% of bookings", kind: "agent" },
+        { id: "db", x: 420, y: 296, w: 140, icon: "database", label: "PostgreSQL", sub: "~1,500 appts / month", kind: "data" },
+        { id: "dash", x: 590, y: 164, w: 120, icon: "chart", label: "Live dashboard", sub: "bookings + 30+ agents" },
       ],
       edges: [
-        { from: "direct", to: "app" },
-        { from: "voice", to: "app" },
-        { from: "app", to: "db" },
-        { from: "app", to: "dash" },
+        { from: "clinic", to: "app", data: "bookings" },
+        { from: "salon", to: "app", data: "bookings" },
+        { from: "other", to: "app", data: "bookings" },
+        { from: "voice", to: "app", data: "book / change" },
+        { from: "app", to: "db", data: "sync" },
+        { from: "db", to: "dash", data: "changes" },
         { from: "voice", to: "dash", dashed: true, label: "status" },
       ],
     },
@@ -304,11 +329,11 @@ export const projects: Project[] = [
         { id: "score", x: 580, y: 164, w: 120, icon: "gauge", label: "Intent accuracy", sub: "~85% → ~92%" },
       ],
       edges: [
-        { from: "change", to: "agent" },
-        { from: "bench", to: "agent", dashed: true },
-        { from: "red", to: "agent", dashed: true },
-        { from: "agent", to: "judge" },
-        { from: "judge", to: "score" },
+        { from: "change", to: "agent", data: "new prompt" },
+        { from: "bench", to: "agent", data: "test calls", dashed: true },
+        { from: "red", to: "agent", data: "attacks", dashed: true },
+        { from: "agent", to: "judge", data: "responses" },
+        { from: "judge", to: "score", data: "scores" },
       ],
     },
     links: [],
@@ -334,11 +359,11 @@ export const projects: Project[] = [
         { id: "snow", x: 580, y: 274, w: 120, icon: "snow", label: "Snowflake", kind: "data" },
       ],
       edges: [
-        { from: "agent", to: "mcp" },
-        { from: "mcp", to: "scope" },
-        { from: "scope", to: "ns" },
-        { from: "scope", to: "sf" },
-        { from: "scope", to: "snow" },
+        { from: "agent", to: "mcp", data: "tool call" },
+        { from: "mcp", to: "scope", data: "request" },
+        { from: "scope", to: "ns", data: "scoped query" },
+        { from: "scope", to: "sf", data: "scoped query" },
+        { from: "scope", to: "snow", data: "scoped query" },
       ],
     },
     links: [
@@ -368,13 +393,13 @@ export const projects: Project[] = [
         { id: "audit", x: 560, y: 270, w: 140, icon: "list", label: "Audit log", kind: "data" },
       ],
       edges: [
-        { from: "inv", to: "extract" },
-        { from: "extract", to: "match" },
-        { from: "match", to: "approve" },
+        { from: "inv", to: "extract", data: "invoice" },
+        { from: "extract", to: "match", data: "fields" },
+        { from: "match", to: "approve", data: "matched" },
         { from: "match", to: "exc", dashed: true, label: "mismatch" },
         { from: "safe", to: "extract", dashed: true },
-        { from: "exc", to: "audit" },
-        { from: "approve", to: "audit" },
+        { from: "exc", to: "audit", data: "exception" },
+        { from: "approve", to: "audit", data: "decision" },
       ],
     },
     links: [],
@@ -399,10 +424,10 @@ export const projects: Project[] = [
         { id: "llm", x: 590, y: 60, w: 110, icon: "cloud", label: "External LLM", kind: "agent" },
       ],
       edges: [
-        { from: "users", to: "portal" },
-        { from: "portal", to: "flow" },
-        { from: "portal", to: "assist" },
-        { from: "flow", to: "llm", label: "REST" },
+        { from: "users", to: "portal", data: "request" },
+        { from: "portal", to: "flow", data: "ticket" },
+        { from: "portal", to: "assist", data: "ticket" },
+        { from: "flow", to: "llm", data: "prompt", label: "REST" },
       ],
     },
     links: [],
@@ -429,9 +454,9 @@ export const projects: Project[] = [
         { id: "out", x: 590, y: 164, w: 120, icon: "gauge", label: "Ticket effort", sub: "down 30%", kind: "data" },
       ],
       edges: [
-        { from: "spm", to: "app" },
-        { from: "tm", to: "app" },
-        { from: "itsm", to: "app" },
+        { from: "spm", to: "app", data: "delivery data" },
+        { from: "tm", to: "app", data: "test results" },
+        { from: "itsm", to: "app", data: "tickets" },
         { from: "app", to: "ui", dashed: true },
         { from: "app", to: "acl", dashed: true },
         { from: "app", to: "out" },
@@ -461,13 +486,13 @@ export const projects: Project[] = [
         { id: "ws", x: 610, y: 176, w: 100, icon: "chart", label: "Workspace", sub: "views" },
       ],
       edges: [
-        { from: "kb", to: "cat", dashed: true },
-        { from: "cat", to: "flow" },
-        { from: "sla", to: "flow", dashed: true },
-        { from: "flow", to: "inc" },
-        { from: "flow", to: "chg" },
-        { from: "inc", to: "ws" },
-        { from: "chg", to: "ws" },
+        { from: "kb", to: "cat", data: "articles", dashed: true },
+        { from: "cat", to: "flow", data: "request" },
+        { from: "sla", to: "flow", data: "timers", dashed: true },
+        { from: "flow", to: "inc", data: "approval" },
+        { from: "flow", to: "chg", data: "approval" },
+        { from: "inc", to: "ws", data: "work items" },
+        { from: "chg", to: "ws", data: "work items" },
       ],
     },
     links: [],
@@ -494,12 +519,44 @@ export const projects: Project[] = [
         { id: "itam", x: 610, y: 164, w: 100, icon: "box", label: "HAM + SAM" },
       ],
       edges: [
-        { from: "cloud", to: "disc" },
-        { from: "mid", to: "disc" },
-        { from: "disc", to: "cmdb" },
-        { from: "cmdb", to: "map" },
+        { from: "cloud", to: "disc", data: "cloud resources" },
+        { from: "mid", to: "disc", data: "scans" },
+        { from: "disc", to: "cmdb", data: "CIs" },
+        { from: "cmdb", to: "map", data: "CIs" },
         { from: "cmdb", to: "event" },
-        { from: "cmdb", to: "itam" },
+        { from: "cmdb", to: "itam", data: "assets" },
+      ],
+    },
+    links: [],
+  },
+  {
+    slug: "jira-service-management",
+    title: "Jira Service Management & Cloud Migration",
+    status: "shipped",
+    summary: "Service desks, automation, and custom apps on Jira, and the move to Jira Cloud.",
+    problem: "Service teams needed structured desks and automation, and the Jira estate had to move to Cloud.",
+    built:
+      "Jira Service Management desks with request types, queues, and SLAs; Automation for Jira and ScriptRunner rules; Forge and Connect apps; Jira and Confluence administration; Jira–GitHub and Jira–ServiceNow integrations; and the move of the estate to Jira Cloud with license cleanup.",
+    stack: ["Jira Service Management", "Automation for Jira", "ScriptRunner", "Forge", "Connect", "Confluence", "Jira Cloud migration"],
+    results: [],
+    diagram: {
+      caption: "The Jira estate moves to Cloud, where service desks, automation rules, custom apps, and integrations run on one platform.",
+      nodes: [
+        { id: "est", x: 20, y: 40, w: 140, icon: "server", label: "Existing Jira", sub: "estate" },
+        { id: "req", x: 20, y: 290, w: 140, icon: "users", label: "Requests", kind: "person" },
+        { id: "core", x: 210, y: 164, w: 150, icon: "cloud", label: "Jira Cloud", sub: "licenses cleaned up", kind: "data" },
+        { id: "jsm", x: 410, y: 40, w: 150, icon: "list", label: "Service desks", sub: "request types, queues, SLAs" },
+        { id: "auto", x: 410, y: 290, w: 150, icon: "workflow", label: "Automation", sub: "Automation for Jira, ScriptRunner", kind: "agent" },
+        { id: "apps", x: 590, y: 40, w: 120, icon: "plug", label: "Forge + Connect", sub: "custom apps" },
+        { id: "int", x: 590, y: 290, w: 120, icon: "sync", label: "Integrations", sub: "GitHub, ServiceNow" },
+      ],
+      edges: [
+        { from: "est", to: "core", data: "migration" },
+        { from: "req", to: "core", data: "requests" },
+        { from: "core", to: "jsm", data: "tickets" },
+        { from: "core", to: "auto", data: "events" },
+        { from: "jsm", to: "apps" },
+        { from: "auto", to: "int" },
       ],
     },
     links: [],
@@ -523,11 +580,11 @@ export const projects: Project[] = [
         { id: "down", x: 560, y: 54, w: 140, icon: "globe", label: "Connected systems", sub: "no downtime", kind: "data" },
       ],
       edges: [
-        { from: "traffic", to: "mule", fading: true, at: 1 },
-        { from: "mule", to: "down", fading: true, at: 1 },
-        { from: "traffic", to: "apim" },
-        { from: "apim", to: "logic" },
-        { from: "logic", to: "down" },
+        { from: "traffic", to: "mule", data: "calls", fading: true, at: 1 },
+        { from: "mule", to: "down", data: "requests", fading: true, at: 1 },
+        { from: "traffic", to: "apim", data: "calls" },
+        { from: "apim", to: "logic", data: "routed calls" },
+        { from: "logic", to: "down", data: "requests" },
       ],
     },
     links: [],
@@ -553,12 +610,12 @@ export const projects: Project[] = [
         { id: "biz", x: 580, y: 164, w: 120, icon: "globe", label: "Business systems", kind: "data" },
       ],
       edges: [
-        { from: "sched", to: "agent" },
-        { from: "mem", to: "agent", dashed: true },
-        { from: "agent", to: "tools" },
-        { from: "agent", to: "mcp" },
-        { from: "tools", to: "biz" },
-        { from: "mcp", to: "biz" },
+        { from: "sched", to: "agent", data: "trigger" },
+        { from: "mem", to: "agent", data: "memory", dashed: true },
+        { from: "agent", to: "tools", data: "action" },
+        { from: "agent", to: "mcp", data: "tool call" },
+        { from: "tools", to: "biz", data: "update" },
+        { from: "mcp", to: "biz", data: "update" },
       ],
     },
     links: [],
@@ -583,11 +640,11 @@ export const projects: Project[] = [
         { id: "measure", x: 360, y: 290, w: 160, icon: "gauge", label: "Attack success", sub: "measured per model", kind: "data" },
       ],
       edges: [
-        { from: "agent", to: "tool" },
-        { from: "tool", to: "out" },
-        { from: "out", to: "def" },
-        { from: "out", to: "measure", dashed: true },
-        { from: "def", to: "measure", dashed: true },
+        { from: "agent", to: "tool", data: "tool call" },
+        { from: "tool", to: "out", data: "result" },
+        { from: "out", to: "def", data: "hidden instruction" },
+        { from: "out", to: "measure", data: "outcome", dashed: true },
+        { from: "def", to: "measure", data: "outcome", dashed: true },
       ],
     },
     links: [],
@@ -613,10 +670,10 @@ export const projects: Project[] = [
         { id: "guard", x: 520, y: 250, w: 180, icon: "shield", label: "Guardrails", sub: "identity / audit / eval / cost", kind: "guard" },
       ],
       edges: [
-        { from: "mcp", to: "core" },
-        { from: "rag", to: "core" },
-        { from: "core", to: "human" },
-        { from: "core", to: "guard" },
+        { from: "mcp", to: "core", data: "tools" },
+        { from: "rag", to: "core", data: "context" },
+        { from: "core", to: "human", data: "review" },
+        { from: "core", to: "guard", data: "checks" },
       ],
     },
     links: [],
@@ -642,11 +699,11 @@ export const projects: Project[] = [
         { id: "review", x: 580, y: 270, w: 120, icon: "eye", label: "Review", sub: "low confidence", kind: "person" },
       ],
       edges: [
-        { from: "raw", to: "agent" },
-        { from: "tax", to: "agent", dashed: true },
-        { from: "agent", to: "score" },
-        { from: "score", to: "ok" },
-        { from: "score", to: "review", dashed: true },
+        { from: "raw", to: "agent", data: "raw attributes" },
+        { from: "tax", to: "agent", data: "categories", dashed: true },
+        { from: "agent", to: "score", data: "mappings" },
+        { from: "score", to: "ok", data: "high confidence" },
+        { from: "score", to: "review", data: "low confidence", dashed: true },
       ],
     },
     links: [],
@@ -672,11 +729,36 @@ export const projects: Project[] = [
         { id: "audit", x: 390, y: 296, w: 150, icon: "list", label: "Audit log", kind: "data" },
       ],
       edges: [
-        { from: "sb", to: "agent" },
-        { from: "eb", to: "agent" },
-        { from: "agent", to: "id" },
-        { from: "id", to: "tools" },
-        { from: "id", to: "audit", dashed: true },
+        { from: "sb", to: "agent", data: "event" },
+        { from: "eb", to: "agent", data: "event" },
+        { from: "agent", to: "id", data: "tool call" },
+        { from: "id", to: "tools", data: "verified call" },
+        { from: "id", to: "audit", data: "log entry", dashed: true },
+      ],
+    },
+    links: [],
+  },
+  {
+    slug: "python-api-connector",
+    title: "Python API Connector",
+    status: "in-progress",
+    summary: "Pulls paginated REST API data into PostgreSQL for reporting.",
+    problem: "Reporting needed data that sits behind a paginated REST API.",
+    built: "A Python service that pulls paginated REST API data into PostgreSQL for reporting.",
+    stack: ["Python", "REST API", "Pagination", "PostgreSQL"],
+    results: ["In progress"],
+    diagram: {
+      caption: "The connector walks the API page by page and loads the results into PostgreSQL for reporting.",
+      nodes: [
+        { id: "api", x: 20, y: 164, w: 140, icon: "cloud", label: "REST API", sub: "paginated" },
+        { id: "conn", x: 210, y: 164, w: 150, icon: "sync", label: "Python connector", sub: "page by page", kind: "agent" },
+        { id: "pg", x: 410, y: 164, w: 140, icon: "database", label: "PostgreSQL", kind: "data" },
+        { id: "rep", x: 590, y: 164, w: 120, icon: "chart", label: "Reporting" },
+      ],
+      edges: [
+        { from: "api", to: "conn", data: "pages" },
+        { from: "conn", to: "pg", data: "rows" },
+        { from: "pg", to: "rep", data: "data" },
       ],
     },
     links: [],
@@ -712,8 +794,12 @@ export const skills: { group: string; items: string[] }[] = [
     items: ["ITSM", "ITOM", "SPM / ITBM", "Test Management 2.0", "CMDB & CSDM", "Discovery", "Service Mapping", "Event Management & AIOps", "ITAM (HAM, SAM)", "HR Service Delivery", "CSM", "SecOps (SIR, VR)", "Virtual Agent", "Now Assist", "Service Portal", "UI Builder", "Workspace", "Flow Designer", "IntegrationHub", "ATF", "Scoped apps", "Performance Analytics"],
   },
   {
+    group: "Atlassian",
+    items: ["Jira Software", "Jira Service Management", "Confluence", "Jira administration", "Automation for Jira", "ScriptRunner", "Forge", "Connect", "Jira Cloud migration", "Jira–GitHub integration", "Jira–ServiceNow integration"],
+  },
+  {
     group: "Platforms",
-    items: ["Salesforce", "SAP", "NetSuite", "Workday", "Jira"],
+    items: ["Salesforce", "SAP", "NetSuite", "Workday"],
   },
 ];
 

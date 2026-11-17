@@ -19,6 +19,7 @@
   --warn: #f6b94c;
   --grid: rgba(147, 163, 190, 0.11);
   --json-key: #7dd3fc;
+  --photo-glow: rgba(46, 230, 208, 0.28);
 
   /* diagram tokens (dark) */
   --dg-bg: #0a1222;
@@ -32,6 +33,9 @@
   --dg-threat: #ff7a85;
   --dg-threat-bg: rgba(255, 122, 133, 0.08);
   --dg-glow: rgba(46, 230, 208, 0.35);
+  --dg-shadow: rgba(0, 0, 0, 0.45);
+  --dg-gloss: rgba(255, 255, 255, 0.06);
+  --dg-pipe: rgba(79, 100, 136, 0.22);
 
   --paper: #f7f9fc;
   --paper-ink: #0b1628;
@@ -60,6 +64,7 @@
   --warn: #9a5b00;
   --grid: rgba(10, 20, 38, 0.08);
   --json-key: #2556c7;
+  --photo-glow: rgba(11, 127, 117, 0.18);
   --dg-bg: #f9fbfe;
   --dg-node: #ffffff;
   --dg-stroke: #c3cfdf;
@@ -71,6 +76,9 @@
   --dg-threat: #c2353f;
   --dg-threat-bg: #fdeef0;
   --dg-glow: rgba(11, 127, 117, 0.25);
+  --dg-shadow: rgba(10, 20, 38, 0.12);
+  --dg-gloss: rgba(255, 255, 255, 0.75);
+  --dg-pipe: rgba(133, 150, 176, 0.18);
   color-scheme: light;
 }
 
@@ -155,6 +163,32 @@ body {
   mask-image: radial-gradient(ellipse 80% 70% at 60% 40%, #000 30%, transparent 75%);
 }
 
+/* Cursor spotlight: brighter dots that follow the pointer across the hero */
+.dot-grid-lit {
+  background-image: radial-gradient(var(--accent) 1.3px, transparent 1.4px);
+  background-size: 28px 28px;
+  -webkit-mask-image: radial-gradient(220px circle at var(--mx, -999px) var(--my, -999px), rgba(0, 0, 0, 0.85), transparent 72%);
+  mask-image: radial-gradient(220px circle at var(--mx, -999px) var(--my, -999px), rgba(0, 0, 0, 0.85), transparent 72%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+[data-pointer="in"] .dot-grid-lit {
+  opacity: 0.5;
+}
+
+/* About portrait: cut-out photo on a themed card */
+.portrait-img {
+  /* rounded bottom corners to match the card; the top stays open so the head can rise above it */
+  clip-path: inset(0 0 0 0 round 0 0 1.5rem 1.5rem);
+  filter: drop-shadow(0 -6px 22px var(--photo-glow)) drop-shadow(0 18px 30px rgba(0, 0, 0, 0.25));
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.portrait:hover .portrait-img {
+  transform: translateY(-6px) scale(1.015);
+}
+.portrait-orbit {
+  transform: rotate(-8deg);
+}
 /* Section anchor offset for the sticky nav */
 section[id] {
   scroll-margin-top: 5rem;
@@ -232,6 +266,18 @@ section[tabindex="-1"]:focus {
 :is([data-active="true"], .group:hover) .dg-flow { stroke-dasharray: 2 3; animation: dg-flow 0.8s linear infinite; }
 :is([data-active="true"], .group:hover) .dg-draw { animation: dg-blink 1.2s ease-in-out infinite; }
 :is([data-active="true"], .group:hover) .dg-look { animation: dg-look 2s ease-in-out infinite; }
+
+/* diagram shapes and pipes */
+.dg-orbit,
+.dg-throb {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+:is([data-active="true"], .group:hover) .dg-orbit { animation: dg-spin 6s linear infinite; }
+:is([data-active="true"], .group:hover) .dg-throb { animation: dg-throb 1.2s ease-in-out infinite; }
+.dg-pipe { animation: dg-pipe 0.9s linear infinite; }
+@keyframes dg-pipe { to { stroke-dashoffset: -20; } }
+@keyframes dg-throb { 0%, 100% { transform: rotate(45deg); } 50% { transform: rotate(45deg) scale(1.1); } }
 
 @keyframes dg-bar { from { transform: scaleY(0.35); } to { transform: scaleY(1.15); } }
 @keyframes dg-pulse { 50% { transform: scale(1.5); opacity: 0.5; } }
