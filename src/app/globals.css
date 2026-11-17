@@ -1,0 +1,266 @@
+@import "tailwindcss";
+@import "@fontsource-variable/bricolage-grotesque/wght.css";
+@import "lenis/dist/lenis.css";
+
+/* ---------------------------------------------------------------------------
+   Design tokens. Dark is the default; [data-theme="light"] switches.
+   "paper" tokens are always light: they style the white-paper case studies.
+   ------------------------------------------------------------------------- */
+:root {
+  --bg: #060a13;
+  --bg-2: #0a1120;
+  --panel: #0d1526;
+  --line: #1c2a44;
+  --fg: #e7edf7;
+  --muted: #93a3be;
+  --accent: #2ee6d0;
+  --accent-soft: rgba(46, 230, 208, 0.12);
+  --accent-ink: #03211d;
+  --warn: #f6b94c;
+  --grid: rgba(147, 163, 190, 0.11);
+  --json-key: #7dd3fc;
+
+  /* diagram tokens (dark) */
+  --dg-bg: #0a1222;
+  --dg-node: #0f192d;
+  --dg-stroke: #2a3b5c;
+  --dg-edge: #4f6488;
+  --dg-icon: #c9d5e8;
+  --dg-icon-bg: rgba(147, 163, 190, 0.1);
+  --dg-agent-bg: rgba(46, 230, 208, 0.08);
+  --dg-guard-bg: rgba(246, 185, 76, 0.08);
+  --dg-threat: #ff7a85;
+  --dg-threat-bg: rgba(255, 122, 133, 0.08);
+  --dg-glow: rgba(46, 230, 208, 0.35);
+
+  --paper: #f7f9fc;
+  --paper-ink: #0b1628;
+  --paper-muted: #4d5d77;
+  --paper-line: #d3dce8;
+  --paper-accent: #0b7f75;
+  --paper-agent: #e3f6f3;
+  --paper-guard: #b26b00;
+  --paper-guard-bg: #fff5e3;
+  --paper-threat: #c2353f;
+  --paper-threat-bg: #fdecee;
+
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --bg: #f4f7fb;
+  --bg-2: #eaf0f7;
+  --panel: #ffffff;
+  --line: #d5deea;
+  --fg: #0a1426;
+  --muted: #4a5a74;
+  --accent: #0b7f75;
+  --accent-soft: rgba(11, 127, 117, 0.1);
+  --accent-ink: #ffffff;
+  --warn: #9a5b00;
+  --grid: rgba(10, 20, 38, 0.08);
+  --json-key: #2556c7;
+  --dg-bg: #f9fbfe;
+  --dg-node: #ffffff;
+  --dg-stroke: #c3cfdf;
+  --dg-edge: #8596b0;
+  --dg-icon: #23324d;
+  --dg-icon-bg: rgba(10, 20, 38, 0.05);
+  --dg-agent-bg: rgba(11, 127, 117, 0.07);
+  --dg-guard-bg: #fff6e6;
+  --dg-threat: #c2353f;
+  --dg-threat-bg: #fdeef0;
+  --dg-glow: rgba(11, 127, 117, 0.25);
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-panel: var(--panel);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-warn: var(--warn);
+  --color-paper: var(--paper);
+  --color-paper-ink: var(--paper-ink);
+  --color-paper-muted: var(--paper-muted);
+  --color-paper-line: var(--paper-line);
+  --color-paper-accent: var(--paper-accent);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: "Bricolage Grotesque Variable", var(--font-geist-sans), sans-serif;
+}
+
+html {
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  letter-spacing: -0.03em;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hidden until focused: lets keyboard users skip the nav */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 100;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  transition: top 0.2s ease;
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* Hero dot grid */
+.dot-grid {
+  background-image: radial-gradient(var(--grid) 1.2px, transparent 1.2px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse 80% 70% at 60% 40%, #000 30%, transparent 75%);
+}
+
+/* Section anchor offset for the sticky nav */
+section[id] {
+  scroll-margin-top: 5rem;
+}
+
+/* White-paper typography */
+.paper-body {
+  font-family: var(--font-sans);
+  color: var(--paper-ink);
+}
+.paper-body p {
+  max-width: 64ch;
+}
+
+/* Hero entrance: pure CSS so it paints before any JavaScript loads */
+@keyframes hero-rise {
+  from {
+    transform: translateY(45%);
+    opacity: 0.15;
+  }
+}
+@keyframes hero-fade {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+.hero-rise {
+  animation: hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.hero-fade {
+  animation: hero-fade 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Programmatic focus on sections (after nav clicks) shouldn't draw a ring */
+section[tabindex="-1"]:focus {
+  outline: none;
+}
+
+/* Blinking caret for the role rotator and the request preview */
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+.caret {
+  animation: blink 1s steps(1) infinite;
+}
+
+/* ---------------------------------------------------------------------------
+   Diagram icon motion: plays on the active step in a case study, and on
+   card hover for thumbnails.
+   ------------------------------------------------------------------------- */
+.dg-icon * {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+:is([data-active="true"], .group:hover) .dg-bar { animation: dg-bar 0.7s ease-in-out infinite alternate; }
+:is([data-active="true"], .group:hover) .dg-pulse { animation: dg-pulse 1.4s ease-in-out infinite; }
+:is([data-active="true"], .group:hover) .dg-blink { animation: dg-blink 1.2s ease-in-out infinite; }
+:is([data-active="true"], .group:hover) .dg-pop { animation: dg-pop 1.6s ease-in-out infinite; }
+:is([data-active="true"], .group:hover) .dg-bob { animation: dg-bob 1.6s ease-in-out infinite; }
+:is([data-active="true"], .group:hover) .dg-ring { animation: dg-ring 1.2s ease-in-out infinite; }
+:is([data-active="true"], .group:hover) .dg-eyes { animation: dg-eyes 2.4s ease-in-out infinite; }
+:is([data-active="true"], .group:hover) .dg-tilt { animation: dg-tilt 1.6s ease-in-out infinite; }
+:is([data-active="true"], .group:hover) .dg-spin { animation: dg-spin 3s linear infinite; }
+:is([data-active="true"], .group:hover) .dg-hand { transform-origin: 50% 100%; animation: dg-spin 2.4s linear infinite; }
+:is([data-active="true"], .group:hover) .dg-needle { transform-origin: 0% 100%; animation: dg-needle 1.8s ease-in-out infinite alternate; }
+:is([data-active="true"], .group:hover) .dg-turn { animation: dg-turn 2s ease-in-out infinite alternate; }
+:is([data-active="true"], .group:hover) .dg-scan { animation: dg-scan 1.4s ease-in-out infinite alternate; }
+:is([data-active="true"], .group:hover) .dg-stamp { animation: dg-stamp 1.4s ease-in infinite; }
+:is([data-active="true"], .group:hover) .dg-shake { animation: dg-shake 0.5s ease-in-out infinite; }
+:is([data-active="true"], .group:hover) .dg-twinkle { animation: dg-twinkle 1.4s ease-in-out infinite; }
+:is([data-active="true"], .group:hover) .dg-flicker { animation: dg-flicker 1.2s steps(1) infinite; }
+:is([data-active="true"], .group:hover) .dg-flow { stroke-dasharray: 2 3; animation: dg-flow 0.8s linear infinite; }
+:is([data-active="true"], .group:hover) .dg-draw { animation: dg-blink 1.2s ease-in-out infinite; }
+:is([data-active="true"], .group:hover) .dg-look { animation: dg-look 2s ease-in-out infinite; }
+
+@keyframes dg-bar { from { transform: scaleY(0.35); } to { transform: scaleY(1.15); } }
+@keyframes dg-pulse { 50% { transform: scale(1.5); opacity: 0.5; } }
+@keyframes dg-blink { 50% { opacity: 0.2; } }
+@keyframes dg-pop { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.25); } }
+@keyframes dg-bob { 50% { transform: translateY(-1.6px); } }
+@keyframes dg-ring { 0%, 60%, 100% { transform: rotate(0); } 10%, 30%, 50% { transform: rotate(-10deg); } 20%, 40% { transform: rotate(10deg); } }
+@keyframes dg-eyes { 0%, 44%, 52%, 100% { transform: scaleY(1); } 48% { transform: scaleY(0.1); } }
+@keyframes dg-tilt { 50% { transform: rotate(-10deg); } }
+@keyframes dg-spin { to { transform: rotate(360deg); } }
+@keyframes dg-needle { from { transform: rotate(-70deg); } to { transform: rotate(10deg); } }
+@keyframes dg-turn { from { transform: scaleX(1); } to { transform: scaleX(0.15); } }
+@keyframes dg-scan { from { transform: translateY(-5px); } to { transform: translateY(5px); } }
+@keyframes dg-stamp { 0% { transform: translateY(-4px); } 60%, 100% { transform: translateY(0); } }
+@keyframes dg-shake { 25% { transform: translateX(-1px); } 75% { transform: translateX(1px); } }
+@keyframes dg-twinkle { 50% { transform: scale(0.7); opacity: 0.5; } }
+@keyframes dg-flicker { 0%, 100% { opacity: 1; } 45% { opacity: 0.35; } 55% { opacity: 1; } 65% { opacity: 0.5; } }
+@keyframes dg-flow { to { stroke-dashoffset: -10; } }
+@keyframes dg-look { 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
+
+/* Belt-and-braces: kill all CSS animation when reduced motion is requested.
+   Framer Motion and the canvas also check this setting separately. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
